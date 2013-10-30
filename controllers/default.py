@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-
 #########################################################################
-## This is a sample controller
-## - index is the default action of any application
-## - user is required for authentication and authorization
-## - download is for downloading files uploaded in the db (does streaming)
-## - call exposes all registered services (none by default)
+#Finnish Vakioveikkaus odds comparison application. Veikkaus.fi odds are
+#compared with betfair.com odds and over/under-played targets are highlighted
 #########################################################################
 
 from bs4 import BeautifulSoup
@@ -14,9 +10,13 @@ import itertools
 import re
 from mechanize import Browser
 
-#header info
 HEADER = {'User-Agent':'Mozilla/5.0'}
 ENCODING = 'utf-8'
+ELEMENT_NUM = 52
+VEIKKAUS_URL = "https://www.veikkaus.fi/mobile?area=wagering&game=sport&op=frontpage"
+VEIKKAUS_LINK_TEXT = 'Pelatuimmuusprosentit'
+PREMIER_URL = 'http://www.betfair.com/exchange/football/competition?id=31'
+CHAMPIONSHIP_URL = 'http://www.betfair.com/exchange/football/competition?id=33'
 
 #helper functions
 #check if the team name includes two words
@@ -81,9 +81,9 @@ def getGamesAndOddsFin(url):
     br.addheaders = [('User-agent', 'Firefox')]
     #retrieve veikkaus vakio mobile home page and browse to game percent page
     #and store the page
-    br.open("https://www.veikkaus.fi/mobile?area=wagering&game=sport&op=frontpage")
+    br.open(url)
     for link in br.links():
-        siteMatch = re.compile('Pelatuimmuusprosentit').search(link.text)
+        siteMatch = re.compile(VEIKKAUS_LINK_TEXT).search(link.text)
         if siteMatch:
             resp = br.follow_link(link)
             result = resp.get_data()
@@ -100,7 +100,7 @@ def getGamesAndOddsFin(url):
     oddsList = []
     #parse game names (first 13 games) into list
     #4 elements per row and 13 rows => 52
-    for idx in range(52):
+    for idx in range(ELEMENT_NUM):
         if idx%4 == 0:
             gameName = gameData[idx].string.strip().encode(ENCODING)
             #full team names
@@ -120,20 +120,16 @@ def getGamesAndOddsFin(url):
 
 def index():
     #get premier league/championship matches and odds from betfair.com
-    preUrl = 'http://www.betfair.com/exchange/football/competition?id=31'
-    chaUrl = 'http://www.betfair.com/exchange/football/competition?id=33'
-    finGameNamesUrl = 'https://www.veikkaus.fi/fi/vakio'
-    preGames = getGamesAndOddsEng(preUrl)
-    chaGames = getGamesAndOddsEng(chaUrl)
+    preGames = getGamesAndOddsEng(PREMIER_URL)
+    chaGames = getGamesAndOddsEng(CHAMPIONSHIP_URL)
     allGamesEng = dict(preGames, **chaGames)
     assert len(preGames)+len(chaGames) == len(allGamesEng), 'Virhe, nimikonflikti !'
     #from vakio site: Full team names, odds and concatenated team names
-    teamNamesFin, gameOddsFin, refNamesFin = getGamesAndOddsFin(finGameNamesUrl)
+    teamNamesFin, gameOddsFin, refNamesFin = getGamesAndOddsFin(VEIKKAUS_URL)
     #get corresponding odds from betfair games
     gameOddsEng = []
     for game in refNamesFin:
         gameOddsEng.append(allGamesEng[game])
-    #print zip(teamNamesFin, gameOddsFin, gameOddsEng)
     return dict(teamNamesFin=teamNamesFin,
                 gameOddsFin=gameOddsFin,
                 gameOddsEng=gameOddsEng)
