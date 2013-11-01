@@ -6,8 +6,8 @@
 
 from BeautifulSoup import BeautifulSoup
 import urllib2
+import itertools
 import re
-import mechanize
 from mechanize import Browser
 
 HEADER = {'User-Agent':'Mozilla/5.0'}
@@ -17,11 +17,6 @@ VEIKKAUS_URL = "https://www.veikkaus.fi/mobile?area=wagering&game=sport&op=front
 VEIKKAUS_LINK_TEXT = 'Pelatuimmuusprosentit'
 PREMIER_URL = 'http://www.betfair.com/exchange/football/competition?id=31'
 CHAMPIONSHIP_URL = 'http://www.betfair.com/exchange/football/competition?id=33'
-#elements
-ELE_ODDS_ENG = 'price'
-ELE_HOME_ENG = 'home-team'
-ELE_AWAY_ENG = 'away-team'
-ELE_ODDS_FIN = 'td'
 
 #helper functions
 #check if the team name includes two words
@@ -46,38 +41,19 @@ def createTeamName(name):
 def getPage(url):
     hdr = HEADER
     req = urllib2.Request(url, headers=hdr)
-    try:       
-        page = urllib2.urlopen(req)
-    except (urllib2.HTTPError, urllib2.URLError) as e:
-        session.code = e.code
-        redirect(URL('default', 'httpError'))
-    else:
-        return BeautifulSoup(page.read())
-        
+    page = urllib2.urlopen(req)
+    return BeautifulSoup(page.read())
 
 #get games and corresponding odds from english site and put them into dictionary    
 def getGamesAndOddsEng(url):
     #html page as a beautifulsoup object
     page = getPage(url)
-    try:
-        #find games odds
-        odds = page.findAll('span', {'class':ELE_ODDS_ENG})
-    except:
-        session.element = ELE_ODDS_ENG
-        redirect(URL('default', 'elementError')) 
-    try:    
-        #find home team names
-        homeTeams = page.findAll('span', {'class':ELE_HOME_ENG})
-    except:
-        session.element = ELE_HOME_ENG
-        redirect(URL('default', 'elementError'))        
-    try:   
-        #find away team names
-        awayTeams = page.findAll('span', {'class':ELE_AWAY_ENG})
-    except:
-        session.element = ELE_AWAY_ENG
-        redirect(URL('default', 'elementError')) 
-  
+    #find games odds
+    odds = page.findAll('span',{'class':'price'})
+    #find home team names
+    homeTeams = page.findAll('span',{'class':'home-team'})
+    #find away team names
+    awayTeams = page.findAll('span',{'class':'away-team'})
     #take every other element of the odds list
     #(original page includes two odds per game case (1,x,2), take always the first one)
     tmp = odds[0::2]
@@ -105,11 +81,7 @@ def getGamesAndOddsFin(url):
     br.addheaders = [('User-agent', 'Firefox')]
     #retrieve veikkaus vakio mobile home page and browse to game percent page
     #and store the page
-    try:
-        br.open(url)
-    except (mechanize.HTTPError, mechanize.URLError) as e:
-        session.code = e.code
-        redirect(URL('default', 'browserError'))      
+    br.open(url)
     for link in br.links():
         siteMatch = re.compile(VEIKKAUS_LINK_TEXT).search(link.text)
         if siteMatch:
@@ -119,11 +91,7 @@ def getGamesAndOddsFin(url):
     #html page as a beautifulsoup object
     page = BeautifulSoup(result)
     #find games names and odds
-    try:
-        gameData = page.findAll(ELE_ODDS_FIN)
-    except:
-        session.element = ELE_ODDS_FIN
-        redirect(URL('default', 'elementError'))  
+    gameData = page.findAll('td')
     #full names   
     nameList = []
     #concatenated names used to select the correct names from betfair data
@@ -150,31 +118,12 @@ def getGamesAndOddsFin(url):
     #create games dictionary including game names and corresponding odds
     return (nameList, gameOdds, refNamesFin)
 
-#exception handlers
-def httpError():
-    return HTML(BODY(B(session.code)))
-
-def elementError():
-    return HTML(BODY(B('Element Not Found: ' + session.element)))
-
-def browserError():
-    return HTML(BODY(B(session.code)))
-
-def overlappingNames():
-    return HTML(BODY(B('Overlapping Names !')))
-   
-
-#controller
 def index():
     #get premier league/championship matches and odds from betfair.com
     preGames = getGamesAndOddsEng(PREMIER_URL)
     chaGames = getGamesAndOddsEng(CHAMPIONSHIP_URL)
     allGamesEng = dict(preGames, **chaGames)
-    #check that there are no overlapping game names
-    try:
-        if len(preGames)+len(chaGames) != len(allGamesEng): raise Exception #assert len(preGames)+len(chaGames) == len(allGamesEng), 'Virhe, nimikonflikti !'
-    except Exception as e:
-        redirect(URL('default', 'overlappingNames'))    
+    assert len(preGames)+len(chaGames) == len(allGamesEng), 'Virhe, nimikonflikti !'
     #from vakio site: Full team names, odds and concatenated team names
     teamNamesFin, gameOddsFin, refNamesFin = getGamesAndOddsFin(VEIKKAUS_URL)
     #get corresponding odds from betfair games
