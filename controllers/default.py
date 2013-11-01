@@ -4,7 +4,7 @@
 #compared with betfair.com odds and over/under-played targets are highlighted
 #########################################################################
 
-from bs4 import BeautifulSoup
+from BeautifulSoup import BeautifulSoup
 import urllib2
 import itertools
 import re
