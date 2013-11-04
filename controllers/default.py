@@ -9,6 +9,8 @@ import urllib2
 import itertools
 import re
 from mechanize import Browser
+import sqlite3
+from time import strftime
 
 HEADER = {'User-Agent':'Mozilla/5.0'}
 ENCODING = 'utf-8'
@@ -17,6 +19,7 @@ VEIKKAUS_URL = "https://www.veikkaus.fi/mobile?area=wagering&game=sport&op=front
 VEIKKAUS_LINK_TEXT = 'Pelatuimmuusprosentit'
 PREMIER_URL = 'http://www.betfair.com/exchange/football/competition?id=31'
 CHAMPIONSHIP_URL = 'http://www.betfair.com/exchange/football/competition?id=33'
+DB_PATH = "../databases/games.db"
 
 #helper functions
 #check if the team name includes two words
@@ -118,7 +121,20 @@ def getGamesAndOddsFin(url):
     #create games dictionary including game names and corresponding odds
     return (nameList, gameOdds, refNamesFin)
 
-def index():
+def dbWrite(wData):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    #create table 
+    cursor.execute("CREATE TABLE IF NOT EXISTS games (id integer PRIMARY KEY, date text, game text, \
+                                                      odds_fin_1 text, odds_fin_x text, odds_fin_2 text, \
+                                                      odds_eng_1 text, odds_eng_x text, odds_eng_2 text)")
+    #if database empty insert the data else replace
+    cursor.executemany("INSERT OR REPLACE INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", wData)                                       
+    conn.commit() 
+    #cursor.execute("SELECT * FROM games")
+    #print cursor.fetchall()
+    
+def main():
     #get premier league/championship matches and odds from betfair.com
     preGames = getGamesAndOddsEng(PREMIER_URL)
     chaGames = getGamesAndOddsEng(CHAMPIONSHIP_URL)
@@ -130,6 +146,30 @@ def index():
     gameOddsEng = []
     for game in refNamesFin:
         gameOddsEng.append(allGamesEng[game])
-    return dict(teamNamesFin=teamNamesFin,
-                gameOddsFin=gameOddsFin,
-                gameOddsEng=gameOddsEng)
+    #unpack odds lists for database write
+    gameOddsFin1 = []
+    gameOddsFin2 = []
+    gameOddsFinX = []
+    gameOddsEng1 = []
+    gameOddsEng2 = []
+    gameOddsEngX = []
+    #database primary keys
+    ids = []
+    for idx in range(len(teamNamesFin)):
+        gameOddsFin1.append(gameOddsFin[idx][0])
+        gameOddsFinX.append(gameOddsFin[idx][1])
+        gameOddsFin2.append(gameOddsFin[idx][2])
+        gameOddsEng1.append(gameOddsEng[idx][0])
+        gameOddsEngX.append(gameOddsEng[idx][1])
+        gameOddsEng2.append(gameOddsEng[idx][2])  
+        ids.append(idx)   
+    #create date list with all elements initialized to current time
+    dateList = [strftime("%d-%m-%Y %H:%M")]*len(teamNamesFin)
+    #zip write data into a single list
+    dbData = zip(ids, dateList, teamNamesFin, gameOddsFin1, gameOddsFinX, gameOddsFin2, 
+                 gameOddsEng1, gameOddsEngX, gameOddsEng2)
+    #database write
+    dbWrite(dbData)
+
+if __name__ == "__main__":
+    main()
