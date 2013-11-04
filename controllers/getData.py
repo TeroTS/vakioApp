@@ -131,8 +131,8 @@ def dbWrite(wData):
     #if database empty insert the data else replace
     cursor.executemany("INSERT OR REPLACE INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", wData)                                       
     conn.commit() 
-    cursor.execute("SELECT * FROM games")
-    print cursor.fetchall()
+    #cursor.execute("SELECT * FROM games")
+    #print cursor.fetchall()
     
 def main():
     #get premier league/championship matches and odds from betfair.com
