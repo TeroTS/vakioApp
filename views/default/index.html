@@ -84,7 +84,11 @@
       <td>Data: {{=rows[0].date}}</td>
       </tr>
       </tbody>
-    </table>   
+    </table>  
+    <form>
+      <input name="test" onkeyup="ajax('calcSum', ['test'], 'target')" />
+    </form>
+    <div id="target"></div>
     <div class="footer">
       <p>&copy; TSProduction 2013</p>
     </div>
