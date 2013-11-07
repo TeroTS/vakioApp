@@ -16,7 +16,7 @@
         max-width: 1000px;
       }
       table[id="odds"] {
-        width:50%;
+        width:60%;
         margin-left: auto;
         margin-right: auto;       
       }
@@ -47,6 +47,7 @@
   </head>
   <body> 
     <div class="container">
+    {{=selForm.custom.begin}}
     <table class="table" id="odds">
       <thead>
         <tr>
@@ -72,7 +73,6 @@
         </tr>
       </thead>
       <tbody>
-      {{=selForm.custom.begin}}
       {{for idx, row in enumerate(rows):}}
         <tr>
           <td>{{=idx+1}}. {{=row.game}}</td>
@@ -82,28 +82,18 @@
           <td>{{=row.odds_eng_1}}</td>
           <td>{{=row.odds_eng_x}}</td>
           <td>{{=row.odds_eng_2}}</td>
-          <td>{{="selForm.custom.widget.box%d"%idx*3}}</td>
-          <td>{{="selForm.custom.widget.box%d"%(idx*3+1)}}</td>
-          <td>{{="selForm.custom.widget.box%d"%(idx*3+2)}}</td>
+          <td>{{=selForm.custom.widget["box%s"%format((idx*3), '06b')]}}</td>
+          <td>{{=selForm.custom.widget["box%s"%format((idx*3+1), '06b')]}}</td>
+          <td>{{=selForm.custom.widget["box%s"%format((idx*3+2), '06b')]}}</td>
         </tr>
       {{pass}}
-      {{=selForm.custom.end}}
-      <tr>
-      <td>Data: {{=rows[0].date}}</td>
-      </tr>
-      <tr>
-      <td>
-      
-
-        {{=selForm.custom.widget.box3}}
-        {{=selForm.custom.widget.box4}}
-        {{=selForm.custom.submit}}
-      
-      {{=selForm.vars}}
-      </td>
-      </tr>
+      <tr><td>Data: {{=rows[0].date}}</td></tr>
       </tbody>
     </table>
+    <div class="span6"></div>
+    {{=selForm.custom.submit}}
+    {{=numOfSafes}}
+    {{=selForm.custom.end}}
     <div id="target"></div>
     <div class="footer">
       <p>&copy; TSProduction 2013</p>
