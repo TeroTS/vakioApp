@@ -92,7 +92,9 @@
     </table>
     <div class="span6"></div>
     {{=selForm.custom.submit}}
-    {{=numOfSafes}}
+    {{if numOfSafes != 0:}}
+      <b>Varmat: {{=numOfSafes}}</b>
+    {{pass}}
     {{=selForm.custom.end}}
     <div id="target"></div>
     <div class="footer">
