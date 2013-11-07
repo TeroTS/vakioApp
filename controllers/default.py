@@ -6,15 +6,17 @@ def index():
     #select all entries
     rows = db(db.games.id > 0).select()
     #create checkboxes to select the game odds
-    selForm = FORM()
-    for idx in range(len(rows)*3):
-        selForm.append(INPUT(_type='checkbox'))
+    #selForm = FORM()
+    #for idx in range(len(rows)*3):
+        #selForm.append(INPUT(_type='checkbox'))
+    selForm = SQLFORM(db.checkBox)
+    #selForm.append(INPUT(_type="submit", _value="OK", _name="okButton"))
     #get selected odds
     oddsSelected = []
     numOfSafes = 0
     numOfPartial = 0
     numOfFull = 0
-    if selForm.process().accepted:
+    if selForm.validate(keepvalues=True): #process().accepted:
         odds = selForm.vars
         #calculate sums for each row/game (row/game includes three odds (1,x,2))
         #depending how many odds selected

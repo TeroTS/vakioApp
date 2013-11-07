@@ -66,9 +66,13 @@
           <th>1</th>
           <th>X</th>
           <th>2</th>
+          <th>1</th>
+          <th>X</th>
+          <th>2</th>          
         </tr>
       </thead>
       <tbody>
+      {{=selForm.custom.begin}}
       {{for idx, row in enumerate(rows):}}
         <tr>
           <td>{{=idx+1}}. {{=row.game}}</td>
@@ -78,16 +82,28 @@
           <td>{{=row.odds_eng_1}}</td>
           <td>{{=row.odds_eng_x}}</td>
           <td>{{=row.odds_eng_2}}</td>
+          <td>{{="selForm.custom.widget.box%d"%idx*3}}</td>
+          <td>{{="selForm.custom.widget.box%d"%(idx*3+1)}}</td>
+          <td>{{="selForm.custom.widget.box%d"%(idx*3+2)}}</td>
         </tr>
       {{pass}}
+      {{=selForm.custom.end}}
       <tr>
       <td>Data: {{=rows[0].date}}</td>
       </tr>
+      <tr>
+      <td>
+      
+
+        {{=selForm.custom.widget.box3}}
+        {{=selForm.custom.widget.box4}}
+        {{=selForm.custom.submit}}
+      
+      {{=selForm.vars}}
+      </td>
+      </tr>
       </tbody>
-    </table>  
-    <form>
-      <input name="test" onkeyup="ajax('calcSum', ['test'], 'target')" />
-    </form>
+    </table>
     <div id="target"></div>
     <div class="footer">
       <p>&copy; TSProduction 2013</p>
