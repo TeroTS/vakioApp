@@ -4,8 +4,8 @@ from gluon.tools import Mail
 ## configure email
 mail = Mail()
 mail.settings.server = 'smtp.gmail.com:587'
-mail.settings.sender = 'tero.t.suhonen@gmail.com'
-mail.settings.login = 'tero.t.suhonen@gmail.com:terorules'
+mail.settings.sender = 'rima.vakio@gmail.com'
+mail.settings.login = 'rima.vakio@gmail.com:rimarules'
 
 #########################################################################
 ## Define your tables below (or better in another model file) for example
@@ -24,8 +24,11 @@ mail.settings.login = 'tero.t.suhonen@gmail.com:terorules'
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
+#this database is written by the script => migrate=false
 db = DAL('sqlite://games.db', migrate = False)
+db2 = DAL('sqlite://email.db')
 
+#date, games and corresponding finnish and english odds
 db.define_table('games',
    Field('date', 'text'),
    Field('game', 'text'),
@@ -81,5 +84,10 @@ db.define_table('checkBox',
                 Field('box100101', 'boolean'),
                 Field('box100110', 'boolean')
                 )
+
+#email message
+db2.define_table('email',
+   Field('message', 'text')
+   )
                 
                 
