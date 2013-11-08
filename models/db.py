@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from gluon.tools import Mail
 
 ## configure email
-#mail = auth.settings.mailer
-#mail.settings.server = 'logging' or 'smtp.gmail.com:587'
-#mail.settings.sender = 'you@gmail.com'
-#mail.settings.login = 'username:password'
+mail = Mail()
+mail.settings.server = 'smtp.gmail.com:587'
+mail.settings.sender = 'tero.t.suhonen@gmail.com'
+mail.settings.login = 'tero.t.suhonen@gmail.com:terorules'
 
 #########################################################################
 ## Define your tables below (or better in another model file) for example
