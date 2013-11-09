@@ -110,6 +110,9 @@
       </tbody>
     </table>
     {{=selForm.custom.submit}}
+    {{if selForm.errors == True:}}
+      <b>Tyhjä rivi!</b>
+    {{else:}}
     {{if numOfSafes != 0:}}
       <b>Varmat: {{=numOfSafes}}</b>
     {{pass}}
@@ -118,6 +121,7 @@
     {{pass}}
     {{if numOfFulls != 0:}}
       <b>Tukot: {{=numOfFulls}}</b>
+    {{pass}}
     {{pass}}
     {{=selForm.custom.end}}
     </div> <!-- selForm -->

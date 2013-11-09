@@ -5,6 +5,7 @@
 
 TEST_RESULT = 15
 
+#convert checkbox values from form to list of tuples for easier calculation
 def calcResults(form):
     checkBoxes = form.vars #selForm.vars
     checkBoxValues = []
@@ -17,8 +18,18 @@ def calcResults(form):
             checkBoxValues.append(0)
     #create checkbox values tuples, 
     #3 checkbox values per tuple(1,x,2) (=one game) 
-    return(zip(*[iter(checkBoxValues)] * 3)) 
+    return(zip(*[iter(checkBoxValues)] * 3))
 
+#custom validation function for checkbox form
+#validates that there is no emty rows
+def validateCheckboxes(form):
+    checkBoxes = calcResults(form)
+    for idx in range(len(checkBoxes)):
+        checkBoxSum = sum(checkBoxes[idx])
+        #zero checked in a row, this is illegal row
+        if checkBoxSum == 0:
+            form.errors = True
+           
 def index():
     #select all entries
     rows = db(db.games.id > 0).select()
@@ -41,16 +52,13 @@ def index():
     #2 selected in a row = partial (osittainvaihdeltu)
     #3 selected in a row = full (tukko)
     #checkboxes from view, dict  
-    if selForm.validate(formname='sel', keepvalues=True): 
+    if selForm.validate(formname='sel', keepvalues=True, onvalidation=validateCheckboxes): 
         gameOdds = calcResults(selForm)
         #calculate the number of checked checkboxes per row/game
         for idx in range(len(gameOdds)):
             checkBoxSum = sum(gameOdds[idx])
-            #zero checked in a row, this is illegal row
-            if checkBoxSum == 0:
-                pass; #fix this !!!!!!!!!!!!!!!!!!
             #one checked in a row, safe
-            elif checkBoxSum == 1:
+            if checkBoxSum == 1:
                 numOfSafes += 1
             #two checked in a row, partial
             elif checkBoxSum == 2:
