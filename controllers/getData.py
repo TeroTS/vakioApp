@@ -162,7 +162,7 @@ def main():
         gameOddsEng1.append(gameOddsEng[idx][0])
         gameOddsEngX.append(gameOddsEng[idx][1])
         gameOddsEng2.append(gameOddsEng[idx][2])  
-        ids.append(idx)   
+        ids.append(idx+1)   
     #create date list with all elements initialized to current time
     dateList = [strftime("%d-%m-%Y %H:%M")]*len(teamNamesFin)
     #zip write data into a single list

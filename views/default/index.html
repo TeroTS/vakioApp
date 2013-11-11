@@ -19,8 +19,11 @@
           margin-left: 425px;  
       }
       .formBot input[name="okButton"] {
-          margin-left: 475px;    
-      }      
+          margin-left: 500px;    
+      }
+      .formSel input[value="Laske"] {
+          margin-left: 500px;      
+      }
       body {
         padding-top: 50px;
         padding-bottom: 50px;
@@ -62,6 +65,7 @@
   </head>
   <body> 
     <div class="container">
+    <div class="formSel">
     {{=selForm.custom.begin}}
     <table class="table" id="odds">
       <thead>
@@ -105,18 +109,22 @@
       <tr><td>Data: {{=rows[0].date}}</td></tr>
       </tbody>
     </table>
-    <div class="span6"></div>
     {{=selForm.custom.submit}}
+    {{if selForm.errors == True:}}
+      <b>Tyhjä rivi!</b>
+    {{else:}}
     {{if numOfSafes != 0:}}
       <b>Varmat: {{=numOfSafes}}</b>
     {{pass}}
     {{if numOfPartials != 0:}}
-      <b>Osittainvaihdellut: {{=numOfPartials}}</b>
+      <b>Vaihdellut: {{=numOfPartials}}</b>
     {{pass}}
     {{if numOfFulls != 0:}}
       <b>Tukot: {{=numOfFulls}}</b>
     {{pass}}
-    {{=selForm.custom.end}}   
+    {{pass}}
+    {{=selForm.custom.end}}
+    </div> <!-- selForm -->
     <div class="formBot">
       {{=botForm}}
     </div>

@@ -1,31 +1,17 @@
 # -*- coding: utf-8 -*-
 from gluon.tools import Mail
 
-## configure email
+#configure email
 mail = Mail()
 mail.settings.server = 'smtp.gmail.com:587'
-mail.settings.sender = 'tero.t.suhonen@gmail.com'
-mail.settings.login = 'tero.t.suhonen@gmail.com:terorules'
+mail.settings.sender = 'rima.vakio@gmail.com'
+mail.settings.login = 'rima.vakio@gmail.com:rimarules'
 
-#########################################################################
-## Define your tables below (or better in another model file) for example
-##
-## >>> db.define_table('mytable',Field('myfield','string'))
-##
-## Fields can be 'string','text','password','integer','double','boolean'
-##       'date','time','datetime','blob','upload', 'reference TABLENAME'
-## There is an implicit 'id integer autoincrement' field
-## Consult manual for more options, validators, etc.
-##
-## More API examples for controllers:
-##
-## >>> db.mytable.insert(myfield='value')
-## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
-## >>> for row in rows: print row.id, row.myfield
-#########################################################################
-
+#this database is written by the script => migrate=false
 db = DAL('sqlite://games.db', migrate = False)
+db2 = DAL('sqlite://email.db')
 
+#date, games and corresponding finnish and english odds
 db.define_table('games',
    Field('date', 'text'),
    Field('game', 'text'),
@@ -38,8 +24,7 @@ db.define_table('games',
 
 #generate check boxes, these are not going to be real 
 #db entries. These are here so that SQLFORM can be used in controller =>
-#easier to create custom forms
-#binary names, easier to sort them later
+#easier to create custom forms. Binary names, easier to sort them later
 db.define_table('checkBox',
                 Field('box000000', 'boolean'),
                 Field('box000001', 'boolean'),
@@ -81,5 +66,10 @@ db.define_table('checkBox',
                 Field('box100101', 'boolean'),
                 Field('box100110', 'boolean')
                 )
+
+#email message
+db2.define_table('email',
+   Field('message', 'text')
+   )
                 
                 
