@@ -5,7 +5,7 @@ from gluon.tools import Mail
 mail = Mail()
 mail.settings.server = 'smtp.gmail.com:587'
 mail.settings.sender = 'rima.vakio@gmail.com'
-mail.settings.login = 'rima.vakio@gmail.com:rimarules'
+mail.settings.login = 'rima.vakio@gmail.com:********'
 
 #this database is written by the script => migrate=false
 db = DAL('sqlite://games.db', migrate = False)
